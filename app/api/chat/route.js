@@ -53,9 +53,10 @@ MediBot: "Hello! I'm here to help. May I please have your name? Also, can you te
 export async function POST(req) {
     const openai = new OpenAI({
         baseURL: "https://openrouter.ai/api/v1",
-        apiKey: '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'
-    })
-    const data = await req.json()
+        apiKey: process.env.LLAMA_API_KEY,  // Ensure this matches the key in your .env.local file
+    });
+    
+    const data = await req.json();
 
     const completion = await openai.chat.completions.create({
         messages: [
@@ -67,27 +68,26 @@ export async function POST(req) {
         ],
         model: "openai/gpt-3.5-turbo",
         stream: true,
-    })
+    });
 
     const stream = new ReadableStream({
         async start(controller) {
-            const encoder = new TextEncoder()
-            try{
-                for await (const chunk of completion){
-                    const content = chunk.choices[0]?.delta?.content
-                    if(content){
-                        const text = encoder.encode(content)
-                        controller.enqueue(text)
+            const encoder = new TextEncoder();
+            try {
+                for await (const chunk of completion) {
+                    const content = chunk.choices[0]?.delta?.content;
+                    if (content) {
+                        const text = encoder.encode(content);
+                        controller.enqueue(text);
                     }
                 }
-            }
-            catch(err) {
-                controller.error(err) 
+            } catch (err) {
+                controller.error(err);
             } finally {
-                controller.close() 
+                controller.close();
             }
         },
-    })
+    });
 
-    return new NextResponse(stream)
+    return new Response(stream);  // Use Node.js's Response object instead of NextResponse
 }
