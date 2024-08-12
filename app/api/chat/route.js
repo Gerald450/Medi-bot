@@ -53,7 +53,7 @@ MediBot: "Hello! I'm here to help. May I please have your name? Also, can you te
 export async function POST(req) {
     const openai = new OpenAI({
         baseURL: "https://openrouter.ai/api/v1",
-        apiKey: process.env.LLAMA_API_KEY,  // Ensure this matches the key in your .env.local file
+        apiKey: process.env.LLAMA_API_KEY,  
     });
     
     const data = await req.json();
@@ -89,5 +89,5 @@ export async function POST(req) {
         },
     });
 
-    return new Response(stream);  // Use Node.js's Response object instead of NextResponse
+    return new Response(stream);
 }
